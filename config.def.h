@@ -1,17 +1,18 @@
 /* See LICENSE file for copyright and license details. */
+#include <X11/XF86keysym.h>
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "monospace:size=10" };
-static const char dmenufont[]       = "monospace:size=10";
+static const char *fonts[]          = { "monospace:size=14" };
+static const char dmenufont[]       = "monospace:size=14";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
-static const char col_cyan[]        = "#005577";
+static const char col_cyan[]        = "#fffb77";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
@@ -58,11 +59,29 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "kitty", NULL };
+
+static const char *upvol[]   = { "amixer", "set", "Master", "5%+", "unmute", NULL };
+static const char *downvol[] = { "amixer", "set", "Master", "5%-", "unmute", NULL };
+static const char *mutevol[] = { "amixer", "set", "Master", "toggle", NULL };
+
+static const char *prevtrack[] = { "/usr/bin/playerctl", "previous", NULL };
+static const char *nexttrack[] = { "/usr/bin/playerctl", "next", NULL };
+static const char *playpause[] = { "/usr/bin/playerctl", "play-pause", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ 0,				 XK_Print, spawn, 	   SHCMD("scrot ~/Pictures/screenshots/%Y-%m-%d-%H%M%S.png") }, 
+	{ ShiftMask,			 XK_Print, spawn, 	   SHCMD("scrot -s ~/Pictures/screenshots/%Y-%m-%d-%H%M%S.png") },
+	{ 0,			XF86XK_AudioNext,  spawn,	   {.v = nexttrack } }, 
+       	{ 0,			XF86XK_AudioPrev,  spawn,	   {.v = prevtrack } },
+       	{ 0,			XF86XK_AudioPlay,  spawn,	   {.v = playpause } },
+
+	{ 0, 		XF86XK_AudioRaiseVolume,   spawn,	   {.v = upvol } },
+	{ 0, 		XF86XK_AudioLowerVolume,   spawn, 	   {.v = downvol } },
+	{ 0, 		XF86XK_AudioMute,	   spawn, 	   {.v = mutevol } },
+
+	{ 0,             	       XK_Super_L, spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
@@ -74,6 +93,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
+	{ MODKEY,		        XK_F4,     killclient,     {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
@@ -113,4 +133,5 @@ static const Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
+
 
